@@ -25,4 +25,7 @@ public class Stock implements Serializable {
     @Id
     String date;
     String close;
+    
+    // ID
+    // LabelDate id;
 }
