@@ -6,7 +6,10 @@ import telran.java2022.dto.DatePeriodDto;
 import telran.java2022.dto.StockDto;
 
 public interface StockService {
-    StockDto findStockByDate(DateDto date);
+    StockDto findStockByDate(String symbol ,DateDto date);
 
-    Iterable<StockDto> findStocksByPeriod(DatePeriodDto datePeriodDto);
+    Iterable<StockDto> findStocksByPeriod(String symbol,DatePeriodDto datePeriodDto);
+    
+    Integer downloadDataForStockByPeriod(String label, DatePeriodDto datePeriodDto);
+	
 }

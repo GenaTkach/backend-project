@@ -20,9 +20,9 @@ import telran.java2022.model.Stock;
 @Configuration
 @RequiredArgsConstructor
 public class ServiceConfiguration {
-    
+
     final StockRepository repository;
-    
+
     @Bean
     public ModelMapper getModelMapper() {
 	ModelMapper modelMapper = new ModelMapper();
@@ -33,7 +33,7 @@ public class ServiceConfiguration {
 	return modelMapper;
     }
 
-    @Bean
+    // Парсер через локальный файл
     public void CSVMaptoObject() throws FileNotFoundException {
 	// Cоздаем объект, который парсит из CSV -> Stock
 	CsvToBean<Stock> csvToBean = new CsvToBean<>();
@@ -47,7 +47,8 @@ public class ServiceConfiguration {
 	    // После парсинга создаем из каждой строки листа -> Java объект Stock
 	    Stock stockPerDay = stock;
 	    // Делаем проверку и отсекаем первую строку (заголовки)
-	    if (!stockPerDay.getDate()
+	    if (!stockPerDay.getId()
+		    .getDate()
 		    .equalsIgnoreCase("date")) {
 		repository.save(stockPerDay);
 	    }

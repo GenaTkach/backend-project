@@ -8,7 +8,7 @@ public class StockNotFoundException extends RuntimeException {
 
     private static final long serialVersionUID = -8028703475221309569L;
     
-    public StockNotFoundException(String date) {
-	super("Stock by date - " + date + " doesn't exists");
+    public StockNotFoundException(String symbol, String date) {
+	super(symbol + " stock for date - " + date + " doesn't exists");
     }
 }
