@@ -1,8 +1,10 @@
 package telran.java2022.controller;
 
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -28,8 +30,18 @@ public class StockController {
 	return service.findStocksByPeriod(symbol, datePeriodDto);
     }
 
-    @GetMapping("stock/download/{label}")
+    @GetMapping("stock/download/API/{label}")
     public Integer downloadDataForStockByPeriod(@PathVariable String label, @RequestBody DatePeriodDto datePeriodDto) {
-	return service.downloadDataForStockByPeriod(label, datePeriodDto);
+	return service.downloadDataFromAPIForStockByPeriod(label, datePeriodDto);
+    }
+
+    @GetMapping("stock/download/csv")
+    public Boolean parseDataFromLocalCSV(@RequestParam String symbol) {
+	return service.downloadCSVandParseToDB(symbol);
+    }
+    
+    @GetMapping("stock/min")
+    public StockDto findTopByIdSymbolOrderByClose(@RequestParam String symbol) {
+	return service.findTopByIdSymbolOrderByClose(symbol);
     }
 }

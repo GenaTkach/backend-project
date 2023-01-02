@@ -10,6 +10,9 @@ public interface StockService {
 
     Iterable<StockDto> findStocksByPeriod(String symbol,DatePeriodDto datePeriodDto);
     
-    Integer downloadDataForStockByPeriod(String label, DatePeriodDto datePeriodDto);
-	
+    Integer downloadDataFromAPIForStockByPeriod(String label, DatePeriodDto datePeriodDto);
+    
+    Boolean downloadCSVandParseToDB(String symbol);
+    
+    StockDto findTopByIdSymbolOrderByClose(String symbol);
 }

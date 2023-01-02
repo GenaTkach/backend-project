@@ -42,7 +42,15 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- CSV PARSER -->
+		<!-- Apache Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+		<!-- Apache Commons IO -->
+
+		<!-- CSV PARSER MINE-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
@@ -50,13 +58,21 @@
 		</dependency>
 		<!-- CSV PARSER -->
 
+		<!-- CSV PARSER 2 OPENCSV-->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.7.1</version>
+		</dependency>
 		<!-- CSV PARSER 2 -->
+
+		<!-- CSV PARSER 3 OLYA's-->
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>2.3</version>
 		</dependency>
-		<!-- CSV PARSER 2 -->
+		<!-- CSV PARSER 3 -->
 
 		<!-- MODEL MAPPER -->
 		<dependency>

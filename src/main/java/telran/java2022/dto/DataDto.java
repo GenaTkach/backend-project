@@ -12,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DataDto {
+    String symbol;
     String close;
     String date;
-    String symbol;
 }
