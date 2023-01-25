@@ -1,9 +1,11 @@
 package telran.java2022.dto;
 
+import java.time.LocalDate;
+
 import lombok.Getter;
 
 @Getter
 public class DatePeriodDto {
-    String dateFrom;
-    String dateTo;
+    LocalDate dateFrom;
+    LocalDate dateTo;
 }

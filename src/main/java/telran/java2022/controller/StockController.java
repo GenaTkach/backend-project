@@ -1,6 +1,5 @@
 package telran.java2022.controller;
 
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,7 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 import telran.java2022.dto.DateDto;
 import telran.java2022.dto.DatePeriodDto;
+import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
+import telran.java2022.dto.StockProfitDto;
 import telran.java2022.service.StockService;
 
 @RestController
@@ -39,9 +40,27 @@ public class StockController {
     public Boolean parseDataFromLocalCSV(@RequestParam String symbol) {
 	return service.downloadCSVandParseToDB(symbol);
     }
-    
+
     @GetMapping("stock/min")
     public StockDto findTopByIdSymbolOrderByClose(@RequestParam String symbol) {
 	return service.findTopByIdSymbolOrderByClose(symbol);
     }
+
+    @GetMapping("stock/max")
+    public StockDto findTopByIdSymbolOrderByCloseDesc(@RequestParam String symbol) {
+	return service.findTopByIdSymbolOrderByCloseDesc(symbol);
+    }
+
+    @GetMapping("stock/profit")
+    public Iterable<StockProfitDto> getMinAndMaxYearProfit(@RequestParam String symbol, @RequestParam String fromDate, @RequestParam String toDate,
+	    @RequestParam Integer periodInYears) {
+	return service.getMinAndMaxYearProfit(symbol, fromDate, toDate, periodInYears);
+    }
+    
+    @GetMapping("stock/avg/profit")
+    StockAverageProfitDto getAverageProfit(@RequestParam String symbol, @RequestParam String fromDate, @RequestParam String toDate,
+	    @RequestParam Integer periodInYears) {
+	return service.getAverageProfit(symbol, fromDate, toDate, periodInYears);
+    }
+
 }

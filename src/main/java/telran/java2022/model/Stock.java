@@ -26,5 +26,5 @@ public class Stock implements Serializable {
     @CsvRecurse
     LabelDate id;
     @CsvBindByName(column = "close")
-    String close;
+    Double close;
 }
