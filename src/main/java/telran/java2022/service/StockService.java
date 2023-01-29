@@ -8,6 +8,7 @@ import telran.java2022.dto.StockProfitDto;
 
 public interface StockService {
     StockDto findStockByDate(String symbol, DateDto date);
+    
 
     Iterable<StockDto> findStocksByPeriod(String symbol, DatePeriodDto datePeriodDto);
 
@@ -24,4 +25,8 @@ public interface StockService {
     Iterable<StockProfitDto> getMinAndMaxYearProfit(String symbol, String fromDate, String toDate, Integer periodInYears);
     
     StockAverageProfitDto getAverageProfit(String symbol, String fromDate, String toDate, Integer periodInYears);
+
+    // Correlation 
+    String correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol);
+
 }

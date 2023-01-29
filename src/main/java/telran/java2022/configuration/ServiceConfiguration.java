@@ -36,35 +36,35 @@ public class ServiceConfiguration {
 
     // Парсер через локальный файл
     // Для Stock
-    public void CSVMaptoObject() throws FileNotFoundException {
-	// Cоздаем объект, который парсит из CSV -> Stock
-	CsvToBean<Stock> csvToBean = new CsvToBean<>();
-	// Локальный путь к CSV файлу
-	String pathToCsvFile = "/Users/Gena/Desktop/Desc/Coding/TELRAN PROJECT/AAPL.csv";
-	String[] getSymbol = pathToCsvFile.split("/");
-	String symbol = getSymbol[getSymbol.length - 1].split(".csv")[0];
-	CSVReader csvReader = new CSVReader(new FileReader(pathToCsvFile));
-
-	// Парсинг в лист Stocks
-	List<Stock> list = csvToBean.parse(setMapStrategy(), csvReader);
-	for (Stock stock : list) {
-
-	    ModelMapper modelMapper = getModelMapper();
-	    // После парсинга создаем из каждой строки листа -> Java объект Stock
-	    LabelDate id = modelMapper.map(stock, LabelDate.class);
-	    id.setSymbol(symbol);
-	    System.out.println(id);
-	    Stock stockPerDay = modelMapper.map(stock, Stock.class);
-	    System.out.println(stockPerDay);
-	    stockPerDay.setId(id);
-	    // Делаем проверку и отсекаем первую строку (заголовки)
-	    if (!stockPerDay.getId()
-		    .getDate()
-		    .equalsIgnoreCase("date")) {
-		repository.save(stockPerDay);
-	    }
-	}
-    }
+//    public void CSVMaptoObject() throws FileNotFoundException {
+//	// Cоздаем объект, который парсит из CSV -> Stock
+//	CsvToBean<Stock> csvToBean = new CsvToBean<>();
+//	// Локальный путь к CSV файлу
+//	String pathToCsvFile = "/Users/Gena/Desktop/Desc/Coding/TELRAN PROJECT/AAPL.csv";
+//	String[] getSymbol = pathToCsvFile.split("/");
+//	String symbol = getSymbol[getSymbol.length - 1].split(".csv")[0];
+//	CSVReader csvReader = new CSVReader(new FileReader(pathToCsvFile));
+//
+//	// Парсинг в лист Stocks
+//	List<Stock> list = csvToBean.parse(setMapStrategy(), csvReader);
+//	for (Stock stock : list) {
+//
+//	    ModelMapper modelMapper = getModelMapper();
+//	    // После парсинга создаем из каждой строки листа -> Java объект Stock
+//	    LabelDate id = modelMapper.map(stock, LabelDate.class);
+//	    id.setSymbol(symbol);
+//	    System.out.println(id);
+//	    Stock stockPerDay = modelMapper.map(stock, Stock.class);
+//	    System.out.println(stockPerDay);
+//	    stockPerDay.setId(id);
+//	    // Делаем проверку и отсекаем первую строку (заголовки)
+//	    if (!stockPerDay.getId()
+//		    .getDate()
+//		    .equalsIgnoreCase("date")) {
+//		repository.save(stockPerDay);
+//	    }
+//	}
+//    }
 
     // Устанавливаем парсинг-стратегию
     private ColumnPositionMappingStrategy<Stock> setMapStrategy() {

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 import org.apache.commons.math3.util.Precision;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -21,14 +23,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import lombok.RequiredArgsConstructor;
-import telran.java2022.API.StockAPI;
 import telran.java2022.dao.StockRepository;
-import telran.java2022.dto.DataDto;
 import telran.java2022.dto.DateDto;
 import telran.java2022.dto.DatePeriodDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
-import telran.java2022.dto.StockDtoAPI;
 import telran.java2022.dto.StockProfitDto;
 import telran.java2022.dto.exceptions.StockNotFoundException;
 import telran.java2022.model.LabelDate;
@@ -173,6 +172,8 @@ public class StockServiceImpl implements StockService {
 
 	LocalDate fromDate = LocalDate.parse(from);
 	LocalDate toDate = LocalDate.parse(to);
+	
+	// Проверка на корректность дат
 	if (toDate.isAfter(LocalDate.now())) {
 	    Stock lastDayForThisLabel = repository.findTopByIdSymbolOrderByIdDateDesc(symbol);
 	    toDate = lastDayForThisLabel.getId()
@@ -286,5 +287,50 @@ public class StockServiceImpl implements StockService {
 	StockAverageProfitDto stockAverageProfitDto = new StockAverageProfitDto(symbol, innerPeriodInYears, fromDate,
 		toDate, avgProfit);
 	return stockAverageProfitDto;
+    }
+
+    @Override
+    public String correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol) {
+	Double[] stocksX = findClosePricesByPeriod(firstSymbol, fromDate, toDate);
+	Double[] stocksY = findClosePricesByPeriod(secondSymbol, fromDate, toDate);
+
+	double[] primitiveFirstArray = ArrayUtils.toPrimitive(stocksX);
+	double[] primitiveSecondArray = ArrayUtils.toPrimitive(stocksY);
+
+	// Удалить эти выводы потом
+//	System.out.println(primitiveFirstArray.length);
+//	System.out.println(primitiveSecondArray.length);
+	
+	double correlationRatio = Precision
+		.round(new PearsonsCorrelation().correlation(primitiveFirstArray, primitiveSecondArray), 2);
+	String correlationInterpretation = checkCorrelationRatio(correlationRatio);
+	return firstSymbol + " - " + secondSymbol + "\n" +  correlationRatio + " : " + correlationInterpretation;
+    }
+
+    // Приватный метод для подсчета корреляции
+    private Double[] findClosePricesByPeriod(String symbol, String fromDate, String toDate) {
+	LocalDate from = LocalDate.parse(fromDate);
+	LocalDate to = LocalDate.parse(toDate);
+	return repository.findStocksByIdSymbolAndIdDateBetween(symbol, from, to)
+		.map(s -> s.getClose())
+		.toArray(Double[]::new);
+    }
+
+    // Приватный метод для интерпритации корреляционного коэффициента
+    private String checkCorrelationRatio(double correlationRatio) {
+	if (correlationRatio <= 0.3) {
+	    return "Neglible correlation";
+	}
+	if (0.3 < correlationRatio && correlationRatio <= 0.5) {
+	    return "Weak correlation";
+	}
+	if (0.5 < correlationRatio && correlationRatio <= 0.7) {
+	    return "Moderate correlation";
+	}
+	if (0.7 < correlationRatio && correlationRatio <= 0.9) {
+	    return "Strong correlation";
+	} else {
+	    return "Very strong correlation";
+	}
     }
 }

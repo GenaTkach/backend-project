@@ -15,7 +15,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Document("stocksAPI")
+//@Document("stocksAPI")
+@Document("parsingCSV")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

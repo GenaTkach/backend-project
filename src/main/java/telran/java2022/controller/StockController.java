@@ -52,15 +52,21 @@ public class StockController {
     }
 
     @GetMapping("stock/profit")
-    public Iterable<StockProfitDto> getMinAndMaxYearProfit(@RequestParam String symbol, @RequestParam String fromDate, @RequestParam String toDate,
-	    @RequestParam Integer periodInYears) {
+    public Iterable<StockProfitDto> getMinAndMaxYearProfit(@RequestParam String symbol, @RequestParam String fromDate,
+	    @RequestParam String toDate, @RequestParam Integer periodInYears) {
 	return service.getMinAndMaxYearProfit(symbol, fromDate, toDate, periodInYears);
     }
-    
+
     @GetMapping("stock/avg/profit")
-    StockAverageProfitDto getAverageProfit(@RequestParam String symbol, @RequestParam String fromDate, @RequestParam String toDate,
-	    @RequestParam Integer periodInYears) {
+    StockAverageProfitDto getAverageProfit(@RequestParam String symbol, @RequestParam String fromDate,
+	    @RequestParam String toDate, @RequestParam Integer periodInYears) {
 	return service.getAverageProfit(symbol, fromDate, toDate, periodInYears);
+    }
+
+    @GetMapping("stock/correlation")
+    String correlation(@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String firstSymbol,
+	    @RequestParam String secondSymbol) {
+	return service.correlation(fromDate, toDate, firstSymbol, secondSymbol);
     }
 
 }

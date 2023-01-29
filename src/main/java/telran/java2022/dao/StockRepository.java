@@ -17,4 +17,5 @@ public interface StockRepository extends CrudRepository<Stock, LabelDate> {
     Stock findTopByIdSymbolOrderByCloseDesc(String symbol);
     
     Stock findTopByIdSymbolOrderByIdDateDesc(String symbol);
+
 }
