@@ -172,15 +172,19 @@ public class StockServiceImpl implements StockService {
 
 	LocalDate fromDate = LocalDate.parse(from);
 	LocalDate toDate = LocalDate.parse(to);
-	
-	// Проверка на корректность дат
+
+	// Проверка на корректность дат, если дата заходит за рамку toDate ->
+	// -> берем дату последней акции в базе данных и присваем toDate
 	if (toDate.isAfter(LocalDate.now())) {
 	    Stock lastDayForThisLabel = repository.findTopByIdSymbolOrderByIdDateDesc(symbol);
 	    toDate = lastDayForThisLabel.getId()
 		    .getDate();
 	}
 	final Integer localFinalPeriodInYears = periodInYears;
-//	periodInYears *= 365;
+
+	// Stream 1 -> to List stocksFromDate
+	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate, toDate)
+		.collect(Collectors.toList());
 
 	// Stream 2 -> to List stocksToDates
 	List<Stock> stocksToDate = repository
@@ -188,30 +192,29 @@ public class StockServiceImpl implements StockService {
 			toDate.plusYears(periodInYears))
 		.collect(Collectors.toList());
 
-	// Stream 1 -> to List stocksFromDate
-	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate, toDate)
-		.limit(stocksToDate.size())
-		.collect(Collectors.toList());
-
+	// Лист для создания StockProfit
+	// -> результирующих объектов, получаемых из 1 и 2 stream
 	List<StockProfit> listOfStockProfits = new ArrayList<>();
 
-	// Stream 3
+	// Заполнение ранее созданного листа listOfStockProfits
 	for (int i = 0; i < stocksFromDate.size(); i++) {
-	    StockProfit stockProfit = new StockProfit();
-	    stockProfit.setSymbol(stocksFromDate.get(i)
+	    /*
+	     * Главная проверка Если dateFrom + periodInYears было раньше конечной рамки
+	     * toDate То выполняй функцию getResultingStockProfitFromTwoArrays(), которая
+	     * возвращает StockProfit. Если i хоть раз не заходит в if(), то цикл
+	     * прекращается. Тем самым не бегая просто так.
+	     * 
+	     */
+	    if (stocksFromDate.get(i)
 		    .getId()
-		    .getSymbol());
-	    stockProfit.setDateFrom(stocksFromDate.get(i)
-		    .getId()
-		    .getDate());
-	    stockProfit.setDateTo(stocksToDate.get(i)
-		    .getId()
-		    .getDate());
-	    stockProfit.setCloseStart(stocksFromDate.get(i)
-		    .getClose());
-	    stockProfit.setCloseEnd(stocksToDate.get(i)
-		    .getClose());
-	    listOfStockProfits.add(stockProfit);
+		    .getDate()
+		    .plusYears(periodInYears)
+		    .isBefore(toDate)) {
+		listOfStockProfits
+			.add(getResultingStockProfitFromTwoArrays(i, stocksFromDate, stocksToDate, periodInYears));
+	    } else {
+		break;
+	    }
 	}
 
 	// Sorting array by profit field for fiding MIN and MAX
@@ -260,23 +263,25 @@ public class StockServiceImpl implements StockService {
 
 	List<StockProfit> listOfStockProfits = new ArrayList<>();
 
-	// Stream 3
+	// Заполнение ранее созданного листа listOfStockProfits
 	for (int i = 0; i < stocksFromDate.size(); i++) {
-	    StockProfit stockProfit = new StockProfit();
-	    stockProfit.setSymbol(stocksFromDate.get(i)
+	    /*
+	     * Главная проверка Если dateFrom + periodInYears было раньше конечной рамки
+	     * toDate То выполняй функцию getResultingStockProfitFromTwoArrays(), которая
+	     * возвращает StockProfit. Если i хоть раз не заходит в if(), то цикл
+	     * прекращается. Тем самым не бегая просто так.
+	     * 
+	     */
+	    if (stocksFromDate.get(i)
 		    .getId()
-		    .getSymbol());
-	    stockProfit.setDateFrom(stocksFromDate.get(i)
-		    .getId()
-		    .getDate());
-	    stockProfit.setDateTo(stocksToDate.get(i)
-		    .getId()
-		    .getDate());
-	    stockProfit.setCloseStart(stocksFromDate.get(i)
-		    .getClose());
-	    stockProfit.setCloseEnd(stocksToDate.get(i)
-		    .getClose());
-	    listOfStockProfits.add(stockProfit);
+		    .getDate()
+		    .plusYears(periodInYears)
+		    .isBefore(toDate)) {
+		listOfStockProfits
+			.add(getResultingStockProfitFromTwoArrays(i, stocksFromDate, stocksToDate, periodInYears));
+	    } else {
+		break;
+	    }
 	}
 
 	// Finding average profit
@@ -300,11 +305,96 @@ public class StockServiceImpl implements StockService {
 	// Удалить эти выводы потом
 //	System.out.println(primitiveFirstArray.length);
 //	System.out.println(primitiveSecondArray.length);
-	
+
 	double correlationRatio = Precision
 		.round(new PearsonsCorrelation().correlation(primitiveFirstArray, primitiveSecondArray), 2);
 	String correlationInterpretation = checkCorrelationRatio(correlationRatio);
-	return firstSymbol + " - " + secondSymbol + "\n" +  correlationRatio + " : " + correlationInterpretation;
+	return firstSymbol + " - " + secondSymbol + "\n" + correlationRatio + " : " + correlationInterpretation;
+    }
+
+    // Приватный метод для подсчет макс и мин годовой доходности.
+    // Создает результирующий объект StockProfit
+    private StockProfit getResultingStockProfitFromTwoArrays(int i, List<Stock> stocksFromDate,
+	    List<Stock> stocksToDate, Integer periodInYears) {
+	// j создана для случаев, когда даты dateFrom и dateTo из 2 листов
+	// (stocksFromDate и stocksToDate) не равны.
+	// В таких ситуациях мы алгоритмом подстраиваем dateTo с помощью j
+	int j = i;
+
+	StockProfit stockProfit = new StockProfit();
+	stockProfit.setSymbol(stocksFromDate.get(i)
+		.getId()
+		.getSymbol());
+	stockProfit.setDateFrom(stocksFromDate.get(i)
+		.getId()
+		.getDate());
+
+	// Если даты stocksFromDate и stocksToDate равны
+	if (stocksFromDate.get(i)
+		.getId()
+		.getDate()
+		.plusYears(periodInYears)
+		.isEqual(stocksToDate.get(i)
+			.getId()
+			.getDate())) {
+	    stockProfit.setDateTo(stocksToDate.get(i)
+		    .getId()
+		    .getDate());
+	}
+	// Если дата stocksFromDate позже stocksToDate
+	if (stocksFromDate.get(i)
+		.getId()
+		.getDate()
+		.plusYears(periodInYears)
+		.isAfter(stocksToDate.get(i)
+			.getId()
+			.getDate())) {
+	    while (!stocksFromDate.get(i)
+		    .getId()
+		    .getDate()
+		    .plusYears(periodInYears)
+		    .isBefore(stocksToDate.get(j)
+			    .getId()
+			    .getDate())) {
+		j++;
+	    }
+	    stockProfit.setDateTo(stocksToDate.get(j)
+		    .getId()
+		    .getDate());
+	}
+	// Если дата stocksFromDate раньше stocksToDate
+	if (stocksFromDate.get(i)
+		.getId()
+		.getDate()
+		.plusYears(periodInYears)
+		.isBefore(stocksToDate.get(i)
+			.getId()
+			.getDate())) {
+	    while (!stocksFromDate.get(i)
+		    .getId()
+		    .getDate()
+		    .plusYears(periodInYears)
+		    .isAfter(stocksToDate.get(j)
+			    .getId()
+			    .getDate())
+		    && j != 0 && !stocksFromDate.get(i)
+			    .getId()
+			    .getDate()
+			    .plusYears(periodInYears)
+			    .isEqual(stocksToDate.get(j)
+				    .getId()
+				    .getDate())) {
+		j--;
+	    }
+	    stockProfit.setDateTo(stocksToDate.get(j)
+		    .getId()
+		    .getDate());
+	}
+	stockProfit.setCloseStart(stocksFromDate.get(i)
+		.getClose());
+	stockProfit.setCloseEnd(stocksToDate.get(j)
+		.getClose());
+	return stockProfit;
     }
 
     // Приватный метод для подсчета корреляции
