@@ -1,14 +1,12 @@
 package telran.java2022.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import telran.java2022.dto.DateDto;
-import telran.java2022.dto.DatePeriodDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
 import telran.java2022.dto.StockProfitDto;
@@ -17,23 +15,18 @@ import telran.java2022.service.StockService;
 @RestController
 @RequiredArgsConstructor
 public class StockController {
-
+    
     final StockService service;
 
-    @GetMapping("/stock/{symbol}/date")
-    public StockDto findStockByDate(@PathVariable String symbol, @RequestBody DateDto date) {
+    @GetMapping("/stock/date")
+    public StockDto findStockByDate(@RequestParam String symbol, @RequestParam String date) {
 	return service.findStockByDate(symbol, date);
     }
 
-    @GetMapping("/stock/{symbol}/stocks")
-    public Iterable<StockDto> findStocksByPeriod(@PathVariable String symbol,
-	    @RequestBody DatePeriodDto datePeriodDto) {
-	return service.findStocksByPeriod(symbol, datePeriodDto);
-    }
-
-    @GetMapping("stock/download/API/{label}")
-    public Integer downloadDataForStockByPeriod(@PathVariable String label, @RequestBody DatePeriodDto datePeriodDto) {
-	return service.downloadDataFromAPIForStockByPeriod(label, datePeriodDto);
+    @GetMapping("/stock/period")
+    public Iterable<StockDto> findStocksByPeriod(@RequestParam String symbol,
+	    @RequestParam String dateFrom, @RequestParam String dateTo) {
+	return service.findStocksByPeriod(symbol, dateFrom, dateTo);
     }
 
     @GetMapping("stock/download/csv")
@@ -67,6 +60,11 @@ public class StockController {
     String correlation(@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String firstSymbol,
 	    @RequestParam String secondSymbol) {
 	return service.correlation(fromDate, toDate, firstSymbol, secondSymbol);
+    }
+    
+    @GetMapping("stock/symbols")
+    List<String> findAllSymbolNames() {
+	return service.findAllSymbolNames();
     }
 
 }

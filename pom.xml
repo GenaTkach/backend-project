@@ -24,7 +24,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -41,7 +40,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 		<!-- Apache Commons IO -->
 		<dependency>
 			<groupId>commons-io</groupId>
@@ -49,7 +47,6 @@
 			<version>2.11.0</version>
 		</dependency>
 		<!-- Apache Commons IO -->
-
 		<!-- CSV PARSER MINE-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -57,7 +54,6 @@
 			<version>1.9.0</version>
 		</dependency>
 		<!-- CSV PARSER -->
-
 		<!-- CSV PARSER 2 OPENCSV-->
 		<dependency>
 			<groupId>com.opencsv</groupId>
@@ -65,7 +61,6 @@
 			<version>5.7.1</version>
 		</dependency>
 		<!-- CSV PARSER 2 -->
-
 		<!-- CSV PARSER 3 OLYA's-->
 		<dependency>
 			<groupId>net.sf.opencsv</groupId>
@@ -73,7 +68,6 @@
 			<version>2.3</version>
 		</dependency>
 		<!-- CSV PARSER 3 -->
-
 		<!-- MODEL MAPPER -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
@@ -81,7 +75,6 @@
 			<version>3.0.0</version>
 		</dependency>
 		<!-- MODEL MAPPER -->
-
 		<!-- APACHE MATH LIBRARY-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -90,7 +83,6 @@
 		</dependency>
 		<!-- APACHE MATH LIBRARY-->
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -107,5 +99,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

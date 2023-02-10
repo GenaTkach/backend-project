@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,8 +23,6 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import lombok.RequiredArgsConstructor;
 import telran.java2022.dao.StockRepository;
-import telran.java2022.dto.DateDto;
-import telran.java2022.dto.DatePeriodDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
 import telran.java2022.dto.StockProfitDto;
@@ -45,51 +42,23 @@ public class StockServiceImpl implements StockService {
     final ModelMapper modelMapper;
 
     @Override
-    public StockDto findStockByDate(String symbol, DateDto date) {
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	LabelDate labelDate = new LabelDate(symbol, LocalDate.parse(date.getDate(), formatter));
+    public StockDto findStockByDate(String symbol, String date) {
+	LocalDate localDate = LocalDate.parse(date);
+	LabelDate labelDate = new LabelDate(symbol, localDate);
 	Stock stock = repository.findById(labelDate)
-		.orElseThrow(() -> new StockNotFoundException(symbol, LocalDate.parse(date.getDate(), formatter)));
+		.orElseThrow(() -> new StockNotFoundException(symbol, localDate));
 	return modelMapper.map(stock, StockDto.class);
     }
 
     @Override
-    public Iterable<StockDto> findStocksByPeriod(String symbol, DatePeriodDto datePeriodDto) {
-	return repository
-		.findStocksByIdSymbolAndIdDateBetween(symbol, datePeriodDto.getDateFrom(), datePeriodDto.getDateTo())
+    public Iterable<StockDto> findStocksByPeriod(String symbol, String dateFrom, String dateTo) {
+	LocalDate localDateFrom = LocalDate.parse(dateFrom);
+	LocalDate localDateTo = LocalDate.parse(dateTo);
+	return repository.findStocksByIdSymbolAndIdDateBetween(symbol, localDateFrom, localDateTo)
 		.map(s -> modelMapper.map(s, StockDto.class))
 		.collect(Collectors.toList());
     }
 
-    @Override
-    public Integer downloadDataFromAPIForStockByPeriod(String label, DatePeriodDto datePeriodDto) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-    /**
-     * Метод для загрузки данных по акции за какой-то период времени. Возвращает
-     * кол-во загруженных дневных статистик. Возможно стоит поменять и доработать
-     * этот метод Этот метод для работы со Stock.
-     */
-//    @Override
-//    public Integer downloadDataFromAPIForStockByPeriod(String label, DatePeriodDto datePeriodDto) {
-//	ResponseEntity<StockDtoAPI> responseEntity = StockAPI.request(label, datePeriodDto.getDateFrom(),
-//		datePeriodDto.getDateTo());
-//	List<DataDto> list = responseEntity.getBody()
-//		.getData();
-//	for (int i = 0; i < list.size(); i++) {
-//	    DataDto dataDto = modelMapper.map(list.get(i), DataDto.class);
-//
-//	    String[] splittedTime = dataDto.getDate()
-//		    .split("T");
-//	    LabelDate id = new LabelDate(dataDto.getSymbol(), splittedTime[0]);
-//
-//	    String close = dataDto.getClose();
-//	    Stock stock = new Stock(id, Double.valueOf(close));
-//	    repository.save(stock);
-//	}
-//	return list.size();
-//    }
 
     /**
      * Метод, который скачивает CSV файл на локальный компьютер и после парсит его в
@@ -303,8 +272,8 @@ public class StockServiceImpl implements StockService {
 	double[] primitiveSecondArray = ArrayUtils.toPrimitive(stocksY);
 
 	// Удалить эти выводы потом
-//	System.out.println(primitiveFirstArray.length);
-//	System.out.println(primitiveSecondArray.length);
+	System.out.println(primitiveFirstArray.length);
+	System.out.println(primitiveSecondArray.length);
 
 	double correlationRatio = Precision
 		.round(new PearsonsCorrelation().correlation(primitiveFirstArray, primitiveSecondArray), 2);
@@ -341,6 +310,7 @@ public class StockServiceImpl implements StockService {
 		    .getId()
 		    .getDate());
 	}
+
 	// Если дата stocksFromDate позже stocksToDate
 	if (stocksFromDate.get(i)
 		.getId()
@@ -362,34 +332,7 @@ public class StockServiceImpl implements StockService {
 		    .getId()
 		    .getDate());
 	}
-	// Если дата stocksFromDate раньше stocksToDate
-	if (stocksFromDate.get(i)
-		.getId()
-		.getDate()
-		.plusYears(periodInYears)
-		.isBefore(stocksToDate.get(i)
-			.getId()
-			.getDate())) {
-	    while (!stocksFromDate.get(i)
-		    .getId()
-		    .getDate()
-		    .plusYears(periodInYears)
-		    .isAfter(stocksToDate.get(j)
-			    .getId()
-			    .getDate())
-		    && j != 0 && !stocksFromDate.get(i)
-			    .getId()
-			    .getDate()
-			    .plusYears(periodInYears)
-			    .isEqual(stocksToDate.get(j)
-				    .getId()
-				    .getDate())) {
-		j--;
-	    }
-	    stockProfit.setDateTo(stocksToDate.get(j)
-		    .getId()
-		    .getDate());
-	}
+
 	stockProfit.setCloseStart(stocksFromDate.get(i)
 		.getClose());
 	stockProfit.setCloseEnd(stocksToDate.get(j)
@@ -422,5 +365,10 @@ public class StockServiceImpl implements StockService {
 	} else {
 	    return "Very strong correlation";
 	}
+    }
+
+    @Override
+    public List<String> findAllSymbolNames() {
+	return repository.findAllBy();
     }
 }
