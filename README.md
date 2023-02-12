@@ -6,7 +6,7 @@
 
 ### Base URL: `backend-project-v1.fly.dev`
 
-🟩 ### Get Stock by Date
+### Get Stock by Date
 
 Retrieve stock data for a specific symbol and date.
 
