@@ -11,7 +11,6 @@
 Retrieve stock data for a specific symbol and date.
 
 #### Endpoint
-
 `/stock/date`
 
 #### Query Parameters
@@ -43,17 +42,12 @@ Retrieve stock data for a specific symbol and date.
 - `date`: A date in the format `YYYY-MM-DD` that specifies the date for which the data was retrieved.
 - `close`: The stock's closing price on the specified date.
 
-
-
 ### GET Stock by Period
 
 Retrieve stock data for a specific symbol for a specified date range.
 
 #### Endpoint URL:
 `/stock/period`
-
-#### Request
-Method: `GET`
 
 ##### Query Parameters:
 - `symbol` (required): A string representing the stock symbol. For example, `AAPL` for Apple Inc.
@@ -91,16 +85,12 @@ Method: `GET`
 - `date`: A date in the format `YYYY-MM-DD` that specifies the date for which the data was retrieved.
 - `close`: The stock's closing price on the specified date.
 
-
 ### GET MIN close price
 
 Retrieve the stock data with the lowest `close` price for a specific symbol across all dates.
 
 #### Endpoint URL:
 `/stock/min `
-
-#### Request
-Method: `GET`
 
 ##### Query Parameters:
 - symbol (required): A string representing the stock symbol. For example, `AAPL` for Apple Inc.
@@ -135,9 +125,6 @@ Retrieve the stock data with the highest `close` price for a specific symbol acr
 #### Endpoint URL:
 `/stock/max `
 
-#### Request
-Method: `GET`
-
 ##### Query Parameters:
 - symbol (required): A string representing the stock symbol. For example, `AAPL` for Apple Inc.
 
@@ -171,9 +158,6 @@ into periods of a specified number of years.
 
 #### Endpoint URL:
 `/stock/profit`
-
-#### Request
-Method: `GET`
 
 ##### Query Parameters:
 - `symbol` (required): A string representing the stock symbol. For example, `AAPL` for Apple Inc.
@@ -228,9 +212,6 @@ Retrieve the correlation between two stock symbols over a specified date range.
 #### Endpoint URL:
 `/stock/correlation`
 
-#### Request
-Method: `GET`
-
 ##### Query Parameters:
 - `fromDate` (required): A date in the format `YYYY-MM-DD` that specifies the start date for the data to be retrieved.
 - `toDate` (required): A date in the format `YYYY-MM-DD` that specifies the end date for the data to be retrieved.
@@ -258,8 +239,6 @@ Method: `GET`
 - `secondSymbol`: A string representing the second stock symbol.
 - `correlationRatio`:  A decimal number representing the correlation between the two stock symbols, where 1 indicates a perfect positive correlation, -1 indicates a perfect negative correlation, and 0 indicates no correlation.
 - `interpretation`: Interprets the result of the correlation calculation, depending on the result.
-
-
 
 ### GET all available symbols
 
