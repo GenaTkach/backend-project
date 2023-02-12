@@ -255,15 +255,15 @@ Method: `GET`
 {
         "firstSymbol": "HOOD",
         "secondSymbol": "VII",
-        "correlation": -0.51,
-        "message": "Neglible correlation",
+        "correlationRatio": -0.51,
+        "interpretation": "Neglible correlation",
 }
 `````
 ##### Properties
 - `firstSymbol`: A string representing the first stock symbol.
 - `secondSymbol`: A string representing the second stock symbol.
-- `correlation`:  A decimal number representing the correlation between the two stock symbols, where 1 indicates a perfect positive correlation, -1 - --- `indicates` a perfect negative correlation, and 0 indicates no correlation.
-- `message`: Interprets the result of the correlation calculation, depending on the result.
+- `correlationRatio`:  A decimal number representing the correlation between the two stock symbols, where 1 indicates a perfect positive correlation, -1 indicates a perfect negative correlation, and 0 indicates no correlation.
+- `interpretation`: Interprets the result of the correlation calculation, depending on the result.
 
 
 #### Endpoint
