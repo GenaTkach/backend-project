@@ -5,7 +5,7 @@
 ## API Documentation
 
 ### Base URL: `backend-project-v1.fly.dev`
-
+![#f03c15](https://placehold.co/15x15/f03c15/f03c15.png) `#f03c15`
 ### Get Stock by Date
 
 Retrieve stock data for a specific symbol and date.
