@@ -52,7 +52,7 @@ public class SchedulerService {
 
 	public Boolean downloadCSVandParseToDB(String symbol, long period1, long period2) {
 		final String BASE_URL = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol;
-		File file = new File("/Users/HP/tel-ran-project/" + symbol);
+		File file = new File("/Users/Gena/Desktop/Desc/Coding/TELRAN PROJECT/SCV" + symbol);
 		UriComponents builder = UriComponentsBuilder.fromHttpUrl(BASE_URL).queryParam("period1", period1)
 				.queryParam("period2", period2).build();
 		try {

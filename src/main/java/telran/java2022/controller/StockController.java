@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import telran.java2022.dto.CorrelationDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
 import telran.java2022.dto.StockProfitDto;
@@ -57,7 +58,7 @@ public class StockController {
     }
 
     @GetMapping("stock/correlation")
-    String correlation(@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String firstSymbol,
+    CorrelationDto correlation(@RequestParam String fromDate, @RequestParam String toDate, @RequestParam String firstSymbol,
 	    @RequestParam String secondSymbol) {
 	return service.correlation(fromDate, toDate, firstSymbol, secondSymbol);
     }

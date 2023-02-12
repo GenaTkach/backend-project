@@ -23,6 +23,7 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import lombok.RequiredArgsConstructor;
 import telran.java2022.dao.StockRepository;
+import telran.java2022.dto.CorrelationDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
 import telran.java2022.dto.StockProfitDto;
@@ -74,7 +75,7 @@ public class StockServiceImpl implements StockService {
 	final String BASE_URL = "https://query1.finance.yahoo.com/v7/finance/download/" + symbol;
 
 	// Создание файла и сохранение на локальный диск
-	File file = new File("/Users/Gena/Desktop/Desc/Coding/TELRAN PROJECT/" + symbol);
+	File file = new File("/Users/Gena/Desktop/Desc/Coding/TELRAN PROJECT/CSV/" + symbol);
 
 	// Создание URL адреса, который будет запращивать CSV файл с сайта
 	UriComponents builder = UriComponentsBuilder.fromHttpUrl(BASE_URL)
@@ -264,7 +265,7 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public String correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol) {
+    public CorrelationDto correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol) {
 	Double[] stocksX = findClosePricesByPeriod(firstSymbol, fromDate, toDate);
 	Double[] stocksY = findClosePricesByPeriod(secondSymbol, fromDate, toDate);
 
@@ -275,10 +276,11 @@ public class StockServiceImpl implements StockService {
 	System.out.println(primitiveFirstArray.length);
 	System.out.println(primitiveSecondArray.length);
 
-	double correlationRatio = Precision
+	Double correlationRatio = Precision
 		.round(new PearsonsCorrelation().correlation(primitiveFirstArray, primitiveSecondArray), 2);
-	String correlationInterpretation = checkCorrelationRatio(correlationRatio);
-	return firstSymbol + " - " + secondSymbol + "\n" + correlationRatio + " : " + correlationInterpretation;
+	String interpretation = checkCorrelationRatio(correlationRatio);
+	CorrelationDto correlationDto = new CorrelationDto(firstSymbol, secondSymbol, correlationRatio, interpretation);
+	return correlationDto;
     }
 
     // Приватный метод для подсчет макс и мин годовой доходности.

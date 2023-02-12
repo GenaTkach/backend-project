@@ -2,6 +2,7 @@ package telran.java2022.service;
 
 import java.util.List;
 
+import telran.java2022.dto.CorrelationDto;
 import telran.java2022.dto.StockAverageProfitDto;
 import telran.java2022.dto.StockDto;
 import telran.java2022.dto.StockProfitDto;
@@ -25,7 +26,7 @@ public interface StockService {
     StockAverageProfitDto getAverageProfit(String symbol, String fromDate, String toDate, Integer periodInYears);
 
     // Correlation
-    String correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol);
+    CorrelationDto correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol);
 
     List<String> findAllSymbolNames();
 }
