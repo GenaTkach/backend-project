@@ -4,7 +4,7 @@
 
 ## API Documentation
 
-### Base URL: `Backend-project-v1.fly.dev`
+### Base URL: `backend-project-v1.fly.dev`
 
 ### Get Stock by Date
 
@@ -269,6 +269,8 @@ Method: `GET`
 #### Endpoint
 
 ### GET all available symbols
+
+Retrieve a comprehensive list of currently available symbols from the database.
 
 #### Endpoint URL:
 `/stock/symbols`
