@@ -44,7 +44,6 @@ Retrieve stock data for a specific symbol and date.
 - `close`: The stock's closing price on the specified date.
 
 
-#### Endpoint
 
 ### GET Stock by Period
 
@@ -92,7 +91,6 @@ Method: `GET`
 - `date`: A date in the format `YYYY-MM-DD` that specifies the date for which the data was retrieved.
 - `close`: The stock's closing price on the specified date.
 
-#### Endpoint
 
 ### GET MIN close price
 
@@ -129,7 +127,6 @@ Method: `GET`
 - `date`: A date in the format `YYYY-MM-DD` that specifies the date for which the data was retrieved.
 - `close`: The stock's closing price on the specified date.
 
-#### Endpoint
 
 ### GET MAX close price
 
@@ -166,8 +163,6 @@ Method: `GET`
 - `date`: A date in the format `YYYY-MM-DD` that specifies the date for which the data was retrieved.
 - `close`: The stock's closing price on the specified date.
 
-
-#### Endpoint
 
 ### GET MAX and MIN year profit
 
@@ -225,7 +220,6 @@ which to retrieve stock data.
 - `closeEnd`: The stock's closing price at the end of this period.
 - `yearProfit`: The highest or lowest profit achieved in this period.
 
-#### Endpoint
 
 ### GET correlation
 
@@ -266,7 +260,6 @@ Method: `GET`
 - `interpretation`: Interprets the result of the correlation calculation, depending on the result.
 
 
-#### Endpoint
 
 ### GET all available symbols
 
