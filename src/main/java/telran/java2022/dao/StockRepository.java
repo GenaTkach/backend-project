@@ -12,7 +12,7 @@ import telran.java2022.model.Stock;
 
 public interface StockRepository extends CrudRepository<Stock, LabelDate> {
     
-    Stream<Stock> findStocksByIdSymbolAndIdDateBetween(String symbol, LocalDate from, LocalDate to);
+    Stream<Stock> findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(String symbol, LocalDate from, LocalDate to);
     
     Stock findTopByIdSymbolOrderByClose(String symbol);
     

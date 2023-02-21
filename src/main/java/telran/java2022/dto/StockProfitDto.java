@@ -20,5 +20,6 @@ public class StockProfitDto {
     LocalDate dateTo;
     Double closeStart;
     Double closeEnd;
+    Double income;
     Double yearProfit;
 }

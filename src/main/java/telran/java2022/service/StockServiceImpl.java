@@ -55,11 +55,10 @@ public class StockServiceImpl implements StockService {
     public Iterable<StockDto> findStocksByPeriod(String symbol, String dateFrom, String dateTo) {
 	LocalDate localDateFrom = LocalDate.parse(dateFrom);
 	LocalDate localDateTo = LocalDate.parse(dateTo);
-	return repository.findStocksByIdSymbolAndIdDateBetween(symbol, localDateFrom, localDateTo)
+	return repository.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, localDateFrom, localDateTo)
 		.map(s -> modelMapper.map(s, StockDto.class))
 		.collect(Collectors.toList());
     }
-
 
     /**
      * Метод, который скачивает CSV файл на локальный компьютер и после парсит его в
@@ -153,12 +152,13 @@ public class StockServiceImpl implements StockService {
 	final Integer localFinalPeriodInYears = periodInYears;
 
 	// Stream 1 -> to List stocksFromDate
-	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate, toDate)
+	List<Stock> stocksFromDate = repository
+		.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate, toDate)
 		.collect(Collectors.toList());
 
 	// Stream 2 -> to List stocksToDates
 	List<Stock> stocksToDate = repository
-		.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate.plusYears(periodInYears),
+		.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate.plusYears(periodInYears),
 			toDate.plusYears(periodInYears))
 		.collect(Collectors.toList());
 
@@ -181,7 +181,7 @@ public class StockServiceImpl implements StockService {
 		    .plusYears(periodInYears)
 		    .isBefore(toDate)) {
 		listOfStockProfits
-			.add(getResultingStockProfitFromTwoArrays(i, stocksFromDate, stocksToDate, periodInYears));
+			.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
 	    } else {
 		break;
 	    }
@@ -196,12 +196,16 @@ public class StockServiceImpl implements StockService {
 	StockProfitDto stockProfitDtoMin = modelMapper.map(listOfStockProfits.get(0), StockProfitDto.class);
 	stockProfitDtoMin.setYearProfit(Precision.round(listOfStockProfits.get(0)
 		.getProfit(localFinalPeriodInYears), 2));
+	stockProfitDtoMin.setIncome(Precision.round(listOfStockProfits.get(0)
+		.getIncome(), 3));
 
 	// Maximum StockProfit
 	StockProfitDto stockProfitDtoMax = modelMapper.map(listOfStockProfits.get(listOfStockProfits.size() - 1),
 		StockProfitDto.class);
 	stockProfitDtoMax.setYearProfit(Precision.round(listOfStockProfits.get(listOfStockProfits.size() - 1)
 		.getProfit(localFinalPeriodInYears), 2));
+	stockProfitDtoMax.setIncome(Precision.round(listOfStockProfits.get(listOfStockProfits.size() - 1)
+		.getIncome(), 3));
 
 	// Adding MIN and MAX StockProfits to returning list
 	returnedListOfStatistics.add(stockProfitDtoMin);
@@ -222,12 +226,12 @@ public class StockServiceImpl implements StockService {
 
 	// Stream 2 -> to List stocksToDates
 	List<Stock> stocksToDate = repository
-		.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate.plusYears(periodInYears),
+		.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate.plusYears(periodInYears),
 			toDate.plusYears(periodInYears))
 		.collect(Collectors.toList());
 
 	// Stream 1 -> to List stocksFromDate
-	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetween(symbol, fromDate, toDate)
+	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate, toDate)
 		.limit(stocksToDate.size())
 		.collect(Collectors.toList());
 
@@ -248,7 +252,7 @@ public class StockServiceImpl implements StockService {
 		    .plusYears(periodInYears)
 		    .isBefore(toDate)) {
 		listOfStockProfits
-			.add(getResultingStockProfitFromTwoArrays(i, stocksFromDate, stocksToDate, periodInYears));
+			.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
 	    } else {
 		break;
 	    }
@@ -283,51 +287,52 @@ public class StockServiceImpl implements StockService {
 	return correlationDto;
     }
 
-    // Приватный метод для подсчет макс и мин годовой доходности.
-    // Создает результирующий объект StockProfit
-    private StockProfit getResultingStockProfitFromTwoArrays(int i, List<Stock> stocksFromDate,
+    private StockProfit getStockProfit(int index, List<Stock> stocksFromDate,
 	    List<Stock> stocksToDate, Integer periodInYears) {
-	// j создана для случаев, когда даты dateFrom и dateTo из 2 листов
+	// j и k созданы для случаев, когда даты dateFrom и dateTo из 2 листов
 	// (stocksFromDate и stocksToDate) не равны.
-	// В таких ситуациях мы алгоритмом подстраиваем dateTo с помощью j
-	int j = i;
+	// В таких ситуациях мы алгоритмом подстраиваем dateTo с помощью j и k
+	int j = index;
+	int k = index;
 
 	StockProfit stockProfit = new StockProfit();
-	stockProfit.setSymbol(stocksFromDate.get(i)
+
+	stockProfit.setSymbol(stocksFromDate.get(index)
 		.getId()
 		.getSymbol());
-	stockProfit.setDateFrom(stocksFromDate.get(i)
+	stockProfit.setDateFrom(stocksFromDate.get(index)
 		.getId()
 		.getDate());
 
-	// Если даты stocksFromDate и stocksToDate равны
-	if (stocksFromDate.get(i)
+	LocalDate stockFromDate = stocksFromDate.get(index)
 		.getId()
 		.getDate()
-		.plusYears(periodInYears)
-		.isEqual(stocksToDate.get(i)
-			.getId()
-			.getDate())) {
-	    stockProfit.setDateTo(stocksToDate.get(i)
+		.plusYears(periodInYears);
+	LocalDate stockToDate = stocksToDate.get(index)
+		.getId()
+		.getDate();
+
+	// Если даты stocksFromDate и stocksToDate равны
+	if (stockFromDate.compareTo(stockToDate) == 0) {
+	    stockProfit.setDateTo(stockToDate);
+	}
+	// Если дата stocksFromDate раньше stocksToDate
+	else if (stockFromDate.isBefore(stockToDate)) {
+	    while (stockFromDate.compareTo(stocksToDate.get(k)
+		    .getId()
+		    .getDate()) < 0) {
+		k--;
+		j = k;
+	    }
+	    stockProfit.setDateTo(stocksToDate.get(k)
 		    .getId()
 		    .getDate());
 	}
-
 	// Если дата stocksFromDate позже stocksToDate
-	if (stocksFromDate.get(i)
-		.getId()
-		.getDate()
-		.plusYears(periodInYears)
-		.isAfter(stocksToDate.get(i)
-			.getId()
-			.getDate())) {
-	    while (!stocksFromDate.get(i)
+	else {
+	    while ((stockFromDate.compareTo(stocksToDate.get(j)
 		    .getId()
-		    .getDate()
-		    .plusYears(periodInYears)
-		    .isBefore(stocksToDate.get(j)
-			    .getId()
-			    .getDate())) {
+		    .getDate()) > 0)) {
 		j++;
 	    }
 	    stockProfit.setDateTo(stocksToDate.get(j)
@@ -335,7 +340,7 @@ public class StockServiceImpl implements StockService {
 		    .getDate());
 	}
 
-	stockProfit.setCloseStart(stocksFromDate.get(i)
+	stockProfit.setCloseStart(stocksFromDate.get(index)
 		.getClose());
 	stockProfit.setCloseEnd(stocksToDate.get(j)
 		.getClose());
@@ -346,7 +351,7 @@ public class StockServiceImpl implements StockService {
     private Double[] findClosePricesByPeriod(String symbol, String fromDate, String toDate) {
 	LocalDate from = LocalDate.parse(fromDate);
 	LocalDate to = LocalDate.parse(toDate);
-	return repository.findStocksByIdSymbolAndIdDateBetween(symbol, from, to)
+	return repository.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, from, to)
 		.map(s -> s.getClose())
 		.toArray(Double[]::new);
     }

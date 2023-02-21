@@ -15,9 +15,12 @@ public class StockProfit {
     LocalDate dateTo;
     Double closeStart;
     Double closeEnd;
-//    Double profit;
-    
+
     public Double getProfit(int years) {
 	return (Math.pow(closeEnd / closeStart, 1.0 / years) - 1) * 100;
+    }
+    
+    public Double getIncome() {
+	return closeEnd - closeStart;
     }
 }
