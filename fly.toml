@@ -1,6 +1,6 @@
-# fly.toml file generated for dark-violet-5918 on 2023-02-21T23:54:21+02:00
+# fly.toml file generated for backend-project on 2023-02-22T00:47:38+02:00
 
-app = "dark-violet-5918"
+app = "backend-project"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
