@@ -180,8 +180,7 @@ public class StockServiceImpl implements StockService {
 		    .getDate()
 		    .plusYears(periodInYears)
 		    .isBefore(toDate)) {
-		listOfStockProfits
-			.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
+		listOfStockProfits.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
 	    } else {
 		break;
 	    }
@@ -231,7 +230,8 @@ public class StockServiceImpl implements StockService {
 		.collect(Collectors.toList());
 
 	// Stream 1 -> to List stocksFromDate
-	List<Stock> stocksFromDate = repository.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate, toDate)
+	List<Stock> stocksFromDate = repository
+		.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, fromDate, toDate)
 		.limit(stocksToDate.size())
 		.collect(Collectors.toList());
 
@@ -251,8 +251,7 @@ public class StockServiceImpl implements StockService {
 		    .getDate()
 		    .plusYears(periodInYears)
 		    .isBefore(toDate)) {
-		listOfStockProfits
-			.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
+		listOfStockProfits.add(getStockProfit(i, stocksFromDate, stocksToDate, periodInYears));
 	    } else {
 		break;
 	    }
@@ -270,25 +269,35 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public CorrelationDto correlation(String fromDate, String toDate, String firstSymbol, String secondSymbol) {
+
+	List<String> stockNames = new ArrayList<>();
+	stockNames.add(firstSymbol);
+	stockNames.add(secondSymbol);
+
 	Double[] stocksX = findClosePricesByPeriod(firstSymbol, fromDate, toDate);
 	Double[] stocksY = findClosePricesByPeriod(secondSymbol, fromDate, toDate);
 
-	double[] primitiveFirstArray = ArrayUtils.toPrimitive(stocksX);
-	double[] primitiveSecondArray = ArrayUtils.toPrimitive(stocksY);
+	List<Double[]> stockDayPrices = new ArrayList<>();
+	stockDayPrices.add(stocksX);
+	stockDayPrices.add(stocksY);
 
-	// Удалить эти выводы потом
-	System.out.println(primitiveFirstArray.length);
-	System.out.println(primitiveSecondArray.length);
+	List<String> stockDays = getDays(firstSymbol, fromDate, toDate);
 
-	Double correlationRatio = Precision
-		.round(new PearsonsCorrelation().correlation(primitiveFirstArray, primitiveSecondArray), 2);
+//	// Удалить эти выводы потом
+//	System.out.println(primitiveFirstArray.length);
+//	System.out.println(primitiveSecondArray.length);
+
+	Double correlationRatio = Precision.round(
+		new PearsonsCorrelation().correlation(ArrayUtils.toPrimitive(stocksX), ArrayUtils.toPrimitive(stocksY)),
+		2);
 	String interpretation = checkCorrelationRatio(correlationRatio);
-	CorrelationDto correlationDto = new CorrelationDto(firstSymbol, secondSymbol, correlationRatio, interpretation);
+	CorrelationDto correlationDto = new CorrelationDto(stockNames, correlationRatio, interpretation, stockDayPrices,
+		stockDays);
 	return correlationDto;
     }
 
-    private StockProfit getStockProfit(int index, List<Stock> stocksFromDate,
-	    List<Stock> stocksToDate, Integer periodInYears) {
+    private StockProfit getStockProfit(int index, List<Stock> stocksFromDate, List<Stock> stocksToDate,
+	    Integer periodInYears) {
 	// j и k созданы для случаев, когда даты dateFrom и dateTo из 2 листов
 	// (stocksFromDate и stocksToDate) не равны.
 	// В таких ситуациях мы алгоритмом подстраиваем dateTo с помощью j и k
@@ -354,6 +363,17 @@ public class StockServiceImpl implements StockService {
 	return repository.findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(symbol, from, to)
 		.map(s -> s.getClose())
 		.toArray(Double[]::new);
+    }
+
+    // Приватный метод для получения всех дат для корреляции
+    private List<String> getDays(String firstSymbol, String fromDate, String toDate) {
+	return repository
+		.findStockByIdSymbolAndIdDateBetweenOrderByIdDate(firstSymbol, LocalDate.parse(fromDate),
+			LocalDate.parse(toDate))
+		.map(d -> d.getId()
+			.getDate()
+			.toString())
+		.collect(Collectors.toList());
     }
 
     // Приватный метод для интерпритации корреляционного коэффициента

@@ -11,15 +11,17 @@ import telran.java2022.model.LabelDate;
 import telran.java2022.model.Stock;
 
 public interface StockRepository extends CrudRepository<Stock, LabelDate> {
-    
+
     Stream<Stock> findStocksByIdSymbolAndIdDateBetweenOrderByIdDate(String symbol, LocalDate from, LocalDate to);
-    
+
+    Stream<Stock> findStockByIdSymbolAndIdDateBetweenOrderByIdDate(String symbol, LocalDate from, LocalDate to);
+
     Stock findTopByIdSymbolOrderByClose(String symbol);
-    
+
     Stock findTopByIdSymbolOrderByCloseDesc(String symbol);
-    
+
     Stock findTopByIdSymbolOrderByIdDateDesc(String symbol);
-    
+
     @Aggregation("{ $group: {_id: '$_id.symbol'}}")
     List<String> findAllBy();
 }
